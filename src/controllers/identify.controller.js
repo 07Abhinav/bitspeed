@@ -24,6 +24,7 @@ exports.identifyContact = async (req, res) => {
         contact: {
           primaryContactId: newContact._id,
           linkedId: null,
+          linkPrecedence: "primary",
           emails: [newContact.email].filter(Boolean),
           phoneNumbers: [newContact.phoneNumber].filter(Boolean),
           secondaryContactIds: [],
@@ -44,6 +45,7 @@ exports.identifyContact = async (req, res) => {
     let phoneNumbers = new Set();
     let secondaryContactIds = [];
     let linkedId = null;
+    let linkPrecedence = "primary";
 
     for (const contact of existingContacts) {
       emails.add(contact.email);
@@ -51,7 +53,8 @@ exports.identifyContact = async (req, res) => {
 
       if (contact.linkPrecedence === "secondary") {
         secondaryContactIds.push(contact._id);
-        linkedId = contact.linkedId; // Store the linkedId of secondary contacts
+        linkedId = contact.linkedId;
+        linkPrecedence = "secondary";
       }
     }
 
@@ -71,12 +74,14 @@ exports.identifyContact = async (req, res) => {
       emails.add(email);
       phoneNumbers.add(phoneNumber);
       linkedId = primaryContact._id;
+      linkPrecedence = "secondary";
     }
 
     res.json({
       contact: {
         primaryContactId: primaryContact._id,
         linkedId: linkedId,
+        linkPrecedence: primaryContact.linkPrecedence,
         emails: [...emails].filter(Boolean),
         phoneNumbers: [...phoneNumbers].filter(Boolean),
         secondaryContactIds,
