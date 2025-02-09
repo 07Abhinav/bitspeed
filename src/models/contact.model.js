@@ -1,14 +1,40 @@
-const mongoose = require("mongoose");
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/database");
 
-const contactSchema = new mongoose.Schema(
-  {
-    phoneNumber: { type: String, default: null },
-    email: { type: String, default: null },
-    linkedId: { type: mongoose.Schema.Types.ObjectId, ref: "Contact", default: null },
-    linkPrecedence: { type: String, enum: ["primary", "secondary"], required: true },
+const Contact = sequelize.define("Contact", {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
   },
-  { timestamps: true }
-);
+  phoneNumber: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  linkedId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+  linkPrecedence: {
+    type: DataTypes.ENUM("primary", "secondary"),
+    allowNull: false,
+  },
+  createdAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  },
+  updatedAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  },
+  deletedAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+});
 
-const Contact = mongoose.model("Contact", contactSchema);
 module.exports = Contact;

@@ -1,2 +1,5 @@
 /node_modules
 .env
+database.sqlite
+data/database.sqlite
+/src/config/db.js

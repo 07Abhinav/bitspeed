@@ -1,6 +1,7 @@
 const express = require("express");
-const router = express.Router();
 const { identifyContact } = require("../controllers/identify.controller");
+
+const router = express.Router();
 
 router.post("/identify", identifyContact);
 
