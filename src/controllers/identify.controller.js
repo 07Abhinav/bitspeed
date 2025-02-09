@@ -23,13 +23,9 @@ exports.identifyContact = async (req, res) => {
       return res.json({
         contact: {
           primaryContactId: newContact._id,
-          linkedId: null,
-          linkPrecedence: "primary",
           emails: [newContact.email].filter(Boolean),
           phoneNumbers: [newContact.phoneNumber].filter(Boolean),
           secondaryContactIds: [],
-          createdAt: newContact.createdAt,
-          updatedAt: newContact.updatedAt,
         },
       });
     }
@@ -40,25 +36,20 @@ exports.identifyContact = async (req, res) => {
       primaryContact = existingContacts[0]; // Fallback to first contact
     }
 
-    // Gather all unique emails, phoneNumbers, secondary contact IDs, and linked IDs
+    // Gather all unique emails, phoneNumbers, and secondary contact IDs
     let emails = new Set();
     let phoneNumbers = new Set();
     let secondaryContactIds = [];
-    let linkedId = null;
-    let linkPrecedence = "primary";
 
     for (const contact of existingContacts) {
       emails.add(contact.email);
       phoneNumbers.add(contact.phoneNumber);
-
-      if (contact.linkPrecedence === "secondary") {
+      if (contact._id.toString() !== primaryContact._id.toString()) {
         secondaryContactIds.push(contact._id);
-        linkedId = contact.linkedId;
-        linkPrecedence = "secondary";
       }
     }
 
-    // If the request has new information, create a secondary contact
+    // If the current request has new information, create a secondary contact
     if (
       (!emails.has(email) && email) ||
       (!phoneNumbers.has(phoneNumber) && phoneNumber)
@@ -69,24 +60,17 @@ exports.identifyContact = async (req, res) => {
         linkedId: primaryContact._id,
         linkPrecedence: "secondary",
       });
-
       secondaryContactIds.push(newSecondary._id);
       emails.add(email);
       phoneNumbers.add(phoneNumber);
-      linkedId = primaryContact._id;
-      linkPrecedence = "secondary";
     }
 
     res.json({
       contact: {
         primaryContactId: primaryContact._id,
-        linkedId: linkedId,
-        linkPrecedence: primaryContact.linkPrecedence,
         emails: [...emails].filter(Boolean),
         phoneNumbers: [...phoneNumbers].filter(Boolean),
         secondaryContactIds,
-        createdAt: primaryContact.createdAt,
-        updatedAt: primaryContact.updatedAt,
       },
     });
   } catch (error) {
