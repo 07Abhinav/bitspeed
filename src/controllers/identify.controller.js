@@ -1,4 +1,4 @@
-const { identifyContact } = require("../services/contactService");
+const { identifyContact } = require("../services/contactServices");
 
 exports.identify = async (req, res) => {
   try {
