@@ -1,13 +1,11 @@
 const express = require("express");
-const dotenv = require("dotenv");
 const sequelize = require("./config/database");
-const identifyRoutes = require("./routes/identify.routes");
-
-dotenv.config();
+const contactRoutes = require("./routes/identify.routes");
 
 const app = express();
 app.use(express.json());
+app.use("/api", contactRoutes);
 
-app.use("/api", identifyRoutes);
+sequelize.sync().then(() => console.log("Database Synced"));
 
 module.exports = app;

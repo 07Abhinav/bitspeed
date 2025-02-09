@@ -1,14 +1,21 @@
-const { Sequelize } = require("sequelize");
 require("dotenv").config();
+const { Sequelize } = require("sequelize");
 
-const sequelize = new Sequelize({
-  dialect: "sqlite",
-  storage: "database.sqlite", // SQLite file
+const DB_URL = process.env.DATABASE_URL;
+
+if (!DB_URL) {
+  throw new Error("DATABASE_URL is not defined. Check your .env file.");
+}
+
+const sequelize = new Sequelize(DB_URL, {
+  dialect: "postgres",
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false, // Allow self-signed certs
+    },
+  },
   logging: false,
 });
-
-sequelize.sync({ alter: true }) // Ensures the table structure updates
-  .then(() => console.log("SQLite Database synced"))
-  .catch(err => console.error("Database sync error:", err));
 
 module.exports = sequelize;
